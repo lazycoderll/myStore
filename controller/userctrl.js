@@ -1,7 +1,6 @@
 const User = require('../models/usermodel')
 
 
-
 const createUser = async (req, res) => {
     const email = req.body.email;
     const findUser = await User.findOne({ email: email});
@@ -16,6 +15,5 @@ const createUser = async (req, res) => {
         })
     }
 };
-
 
 module.exports = {createUser}
