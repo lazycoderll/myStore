@@ -1,7 +1,8 @@
 const User = require('../models/usermodel')
+const asyncHandler = require('express-async-handler');
+const { generateToken } = require('../config/jwt');
 
-
-const createUser = async (req, res) => {
+const createUser = asyncHandler( async (req, res) => {
     const email = req.body.email;
     const findUser = await User.findOne({ email: email});
     if(!findUser) {
@@ -9,11 +10,41 @@ const createUser = async (req, res) => {
         const newUser = await User.create(req.body);
         res.json(newUser);
     } else {
-        res.json ({
-            msg: 'user already exists',
-            success: false,
-        })
+      throw new Error('user already exists')
     }
-};
+})
 
-module.exports = {createUser}
+const userLogin = asyncHandler (async (req, res) => {
+    const {email, password} = req.body
+    //check if user exists
+    const findUser = await  User.findOne({email})
+    if(findUser && (await findUser.isPasswordMatched(password))) {
+        res.json({
+          _id: findUser?._id,
+          firstname: findUser?.firstname,
+          lastname:  findUser?.lastname,
+          email: findUser?.email,
+          mobile:  findUser?.mobile,
+          token: generateToken(findUser?._id)
+        })
+    }else {
+        throw new Error('invalid credentials')
+    }
+})
+
+//get all user
+const getallUser = asyncHandler(async (req, res) => {
+    try {
+        const getUsers = await User.find()
+        res.json(getUsers)
+    } catch (error) {
+        throw new Error(error)
+    }
+})
+
+const getaUser = asyncHandler ( async (req, res) => {
+  const  { id } = req.params;
+    console.log(id)
+}) 
+
+module.exports = {createUser, userLogin, getallUser, getaUser}
