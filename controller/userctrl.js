@@ -13,7 +13,7 @@ const createUser = asyncHandler( async (req, res) => {
       throw new Error('user already exists')
     }
 })
-
+//login a user
 const userLogin = asyncHandler (async (req, res) => {
     const {email, password} = req.body
     //check if user exists
@@ -25,7 +25,8 @@ const userLogin = asyncHandler (async (req, res) => {
           lastname:  findUser?.lastname,
           email: findUser?.email,
           mobile:  findUser?.mobile,
-          token: generateToken(findUser?._id)
+          token: generateToken(findUser?._id),
+          role: findUser?.role
         })
     }else {
         throw new Error('invalid credentials')
@@ -33,11 +34,11 @@ const userLogin = asyncHandler (async (req, res) => {
 })
 
 //update a user
-const updateUser = asyncHandler(async (req, res) => {
-    const { id } = req.params;
+const updatedUser = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
     try {
         const updatedUser = await User.findByIdAndUpdate (
-            id,
+            _id,
             {
                 firstname: req?.body.firstname,
                 lastname: req?.body?.lastname,
@@ -88,7 +89,19 @@ const deleteaUser = asyncHandler ( async (req, res) => {
       } catch (error) {
           throw new Error(error)
       }
-  }) 
+  });
 
-  
-module.exports = {createUser, userLogin, getallUser, getaUser, deleteaUser, updateUser}
+  // admin to block a user
+const blockUser = asyncHandler (async (req, res ) => {
+    const { id } = req.params;
+    try {
+        
+    } catch (error) {
+        throw new Error()
+    }
+})
+
+//admin to unblock a user
+const unblockUser = asyncHandler (async (req, res ) => {})
+
+module.exports = {createUser, userLogin, getallUser, getaUser, deleteaUser, updatedUser, blockUser, unblockUser}
